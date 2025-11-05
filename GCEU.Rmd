@@ -11,6 +11,7 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+
 ```{r messages = FALSE}
 ```
 
@@ -63,31 +64,26 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Este proyecto consiste en el estudio de las series temporales sobre un caso práctico. Se implementaran para ello diversos métodos estadísticos con el fin de crear modelos que se ajusten lo mejor posible a nuestro caso practico. Tales métodos como los modelos ARIMA nos permitirán modelar y predecir estos procesos estocásticos. Además de estas técnicas se utilizarán cartografías para la previsualización de estas series temporales.
 
-El estudio de nuestro caso práctico recopila información de los gases de efecto invernadero expulsados por la unión europea desde el año 2010 hasta el primer cuatrimestre de 2023. Estos 7 gases que incluyen el CO2 son los causantes del cambio climático y tienen un impacto gigantesco sobre la flora, la fauna y las personas. Para la construcción del modelo, estimación y diagnosis de este se utilizará el renombrado software R que nos permitirá realizar el análisis a través de sus librerias y funciones estadísticas.
+El estudio de nuestro caso práctico recopila información de los gases de efecto invernadero expulsados por la unión europea desde el año 2008 hasta el primer cuatrimestre de 2025. 
 
 ## Obtención y tratamiento de los datos.
 
 ### Obtención de los datos a traves de la libreria de eurostat
 
-Los datos utilizados para este estudio los obtenemos via eurostat.
-Este es el enlace: <https://ec.europa.eu/eurostat/databrowser/view/env_ac_aigg_q/default/table?lang=en>
+Los datos utilizados para este estudio los obtenemos via eurostat. Este es el enlace: <https://ec.europa.eu/eurostat/databrowser/view/env_ac_aigg_q/default/table?lang=en>
 
 ```{r warnings = FALSE}
 library(eurostat)
 datos = get_eurostat("env_ac_aigg_q")
-summary(datos)
-summary(datos$nace_r2)
-head(datos$unit)
 View(datos)
+unique(datos$unit)
 ```
-Los datos descargados son un un proceso estocastico que transcurre desde el 2010-01-01
-hasta el 2023-01-01 y va aumentando de forma trimestral periodicamente.
 
+Los datos descargados son un un proceso estocastico que transcurre desde el 2010-01-01 hasta el 2023-01-01 y va aumentando de forma trimestral periodicamente.
 
 ### Depuración de los datos a través de la libreria dplyer
 
-La principal variable de medición de interés es THS_T (miles de toneladas de gases de efecto invernadero expulsados), aunque también puede resultar interesante para el estudio analizar las toneladas de gases de efecto invernadero por habitante, y esto lo hacemos a traves de la variable T_HAB. 
-Filtro la base de datos para trabajar con ellas a traves de la libreria dplyer y sus respectivas funciones.
+La principal variable de medición de interés es THS_T (Toneladas de gases de efecto invernadero expulsados).
 
 ```{r warnings = FALSE }
 library(dplyr)
@@ -96,20 +92,15 @@ datosTT <- datos %>%
   filter(unit=="THS_T") %>%
   filter(geo!="EU27_2020") 
 View(datosTT)
-
-datosTHAB <- datos %>%
-  filter(unit=="T_HAB") %>%
-  filter(geo!="EU27_2020") 
-View(datosTHAB)
 ```
+
 Este primer filtrado de los datos se realiza para la posterior visualización y mapeo de los paises europeos.
 
 ## Mapeo y visualización de los datos.
 
 ### Obtención de las cartografias.
 
-Para la creación de los mapas es necesario la descarga de una cartografía que contenga los paises de la Unión Europea y esto lo realizamos a través de la página de eurostat.
-Este es el enlace: <https://ec.europa.eu/eurostat/web/gisco/geodata/reference-data/administrative-units-statistical-units/nuts>
+Para la creación de los mapas es necesario la descarga de una cartografía que contenga los paises de la Unión Europea y esto lo realizamos a través de la página de eurostat. Este es el enlace: <https://ec.europa.eu/eurostat/web/gisco/geodata/reference-data/administrative-units-statistical-units/nuts>
 
 ```{r warnings = FALSE }
 library(sf)
@@ -120,19 +111,18 @@ summary(EU_MAP)
 summary(EU_MAP$LEVL_CODE)
 ```
 
-
 ```{r warnings = FALSE }
 st_crs(EU_MAP)
 ```
-Obtenemos el sistema de referencia que se utiliza en esta cartografía, así como
-los paises y sus repectivas islas ilustradas en el.
+
+Obtenemos el sistema de referencia que se utiliza en esta cartografía, así como los paises y sus repectivas islas ilustradas en el.
 
 ```{r warnings = FALSE }
 tm_shape(EU_MAP)+
   tm_borders()
 ```
-Las graficamos para visualizar y observamos como la cartografia contiene a parte de los paises todos los respectivos multipoligonos asociados a los pueblos y las comunidades autonomas.Por eso es necesario realizar un filtro en la cartografia y quedarnos solo con los NUTS=0 es decir los paises.
 
+Las graficamos para visualizar y observamos como la cartografia contiene a parte de los paises todos los respectivos multipoligonos asociados a los pueblos y las comunidades autonomas.Por eso es necesario realizar un filtro en la cartografia y quedarnos solo con los NUTS=0 es decir los paises.
 
 ```{r warnings = FALSE }
 EU_MAP <- EU_MAP %>%
@@ -141,6 +131,7 @@ EU_MAP <- EU_MAP %>%
 tm_shape(EU_MAP)+
   tm_borders()
 ```
+
 Una vez que nuestra cartografia se coresponde con nuestro objetivo de estudio es momento de unir los datos a la cartografia. Pero nuestra base de datos no contiene informacion de todos los paises pertenecientes a la cartografia por tanto habrá que unirlos solo para los que tenemos información.
 
 ### Unión con los datos.
@@ -148,18 +139,15 @@ Una vez que nuestra cartografia se coresponde con nuestro objetivo de estudio es
 ```{r warnings = FALSE}
 EU_mapa<-dplyr::left_join(EU_MAP, datosTT, by=c("NUTS_ID"="geo"))
 
-EU_mapa_THAB<-dplyr::left_join(EU_MAP, datosTHAB, by=c("NUTS_ID"="geo"))
-
 EU_mapa <- EU_mapa %>%
   filter(values != "NA")
 
-EU_mapa_THAB <- EU_mapa_THAB %>%
-  filter(values != "NA")
 ```
 
 ### Transformación del mapa para la visualización.
 
 Filtramos un trimestre aleatorio para visualizar si todo esta en orden.
+
 ```{r warnings = FALSE}
 EU_mapa2207 <- EU_mapa %>%
   filter(TIME_PERIOD=="2024-07-01")
@@ -170,28 +158,9 @@ tm_shape(EU_mapa2207,)+
 
 La cartografia por culpa de las islas de algunos paises queda muy alejada y la visualización no es buena, por lo que transformamos la caja para visualizar mejor.
 
-```{r}
-tmap_mode("view")
-
-bbox_eu <- st_bbox(c(xmin = -20, ymin = 30, xmax = 40, ymax = 67), crs = 4326)
-
-
-tm_shape(EU_mapa2207, bbox = bbox_eu) +
-  tm_polygons(
-    fill = "values",
-    fill.scale = tm_scale(
-      breaks = c(0, 14000, 36000, 68000, 92000, 280000),
-      values = "brewer.yl_or_rd",  # antes: "YlOrRd"
-      labels = c("≤ 14k", "14k – 36k", "36k – 68k", "68k – 92k", "> 92k")
-    ),
-    fill.legend = tm_legend(title = "Toneladas C02 expulsadas", outside = TRUE)
-  ) +
-  tm_view(view.zoom = 5) +
-  tm_layout(frame = FALSE) +
-  tm_title("Emisiones de Gases de Efecto Invernadero en Europa")
-```
 
 Generamos una BBDD con las medias de los valores de cada pais a lo largo del tiempo para poder visualizar bien la importancia de cada país.
+
 ```{r}
 EU_mapa_media <- EU_mapa %>%
     group_by(NUTS_NAME) %>%        # agrupa por país (ajusta el nombre si es otro, ej. "name")
@@ -219,147 +188,11 @@ tm_shape(EU_mapa_media, bbox = bbox_eu) +
   tm_title("Emisiones de Gases de Efecto Invernadero en media en Europa 2008-2024")
 
 ```
+
 Visualizamos como claramente Alemania es el país que más GEI expulsa, seguido por Francia, Italia y Polonia.
 
+############################################################################################################################################################################################################################################################################################# 
 
-### Mapas animados hay que retocarlos para que salgan bien...
-
-Empezamos creando un mapa animado que transcurre desde el tercer trimetre de 2019 hasta el último trimestre de 2020 para la visualización del efecto del Covid en la expulsión de gases de efecto invernadero.
-```{r}
-library(dplyr)
-library(sf)
-library(tmap)
-
-# 1) Filtrado temporal con TIME_PERIOD
-EU_mapacovidxHAB <- EU_mapa_THAB %>%
-  mutate(TIME_PERIOD = as.Date(TIME_PERIOD)) %>%
-  filter(TIME_PERIOD >= as.Date("2019-07-01"),
-         TIME_PERIOD <= as.Date("2020-10-01"))
-
-# 2) BBox Europa (ajusta si tu CRS es otro)
-bbox_eu <- st_bbox(c(xmin = -20, ymin = 30, xmax = 40, ymax = 67), crs = 4326)
-
-# 3) Mapa animado
-EU_anim <- tm_shape(EU_mapacovidxHAB, bbox = bbox_eu) +
-  tm_polygons(
-    fill = "values",
-    fill.scale = tm_scale(
-      values = "brewer.yl_or_rd",  # paleta YlOrRd versión v4
-      n = 10
-    ),
-    fill.legend = tm_legend(title = "Valores", outside = TRUE)
-  ) +
-  tm_facets(along = "TIME_PERIOD", free.coords = FALSE) +
-  tm_layout(frame = FALSE) +
-  tm_title("Emisiones de GEI por fecha")
-
-# 4) Crear GIF
-tmap_mode("plot")
-
-EU_anim2 <- EU_anim +
-  tm_animate(
-    fps = 3,         # frames por segundo (antes usabas delay = 300 ms)
-    play = "loop"    # reemplaza loop = TRUE
-  )
-
-tmap_animation(
-  EU_anim2,
-  filename = "EU_covidxHAB.gif",
-  width = 1000,
-  height = 800
-)
-
-
-
-```
-```{r}
-library(dplyr)
-library(sf)
-library(ggplot2)
-library(gganimate)
-
-# 1) Fechas y proyección a WGS84 para poder usar límites en lon/lat
-EU_mapacovidxHAB <- EU_mapa_THAB %>%
-  mutate(TIME_PERIOD = as.Date(TIME_PERIOD)) %>%
-  filter(TIME_PERIOD >= as.Date("2019-07-01"),
-         TIME_PERIOD <= as.Date("2024-07-01")) %>%
-  st_transform(4326)   # <- importante para que el zoom en grados funcione
-
-# 2) Rango global (para que la escala no cambie entre frames)
-rng <- range(EU_mapacovidxHAB$values, na.rm = TRUE)
-
-# 3) Mapa + animación
-p <- ggplot(EU_mapacovidxHAB) +
-  geom_sf(aes(fill = values), color = NA) +
-  # ZOOM a Europa (ajusta si quieres):
-  coord_sf(xlim = c(-25, 45), ylim = c(30, 72), expand = FALSE) +
-  scale_fill_viridis_c(option = "D", name = "Valores") +
-  labs(title = "Emisiones de GEI — {frame_time}") +
-  theme_void(base_size = 13) +
-  theme(legend.position = "right")
-
-anim <- p + transition_time(TIME_PERIOD) + ease_aes("linear")
-
-animate(anim, fps = 4, width = 1000, height = 700,
-        renderer = gganimate::gifski_renderer(loop = TRUE))
-
-
-```
-
-
-```{r warnings = FALSE }
-
-
-EU_mapacovidxHAB <- EU_mapa_THAB %>%
-  filter(time>="2019-07-01")%>%
-  filter(time<="2020-10-01")
-
-  
-EU_anim = tm_shape(EU_mapacovidxHAB,bbox=tmaptools::bb(matrix(c(1000000,1000000,6000000,6000000),2,2))) +   tm_fill(palette ="Reds",col = "values", n=10) +
-  tm_facets(along = "time", free.coords = FALSE)
-
-
-tmap_animation(EU_anim, filename = "EU_covidxHAB.gif", delay=300,message=F)
-
-```
-Visualmete observamos como la caida de la contaminación mas notable surje en el segundo trimestre de 2020 por el parón socioeconomico causado por el covid. Aunque como nuestra serie temporal puede que este afectada por la estacionalidad no sabemos con seguridad si el cambio visual es razonable. Habría que comparar los valores de los respectivos trimestres afectados por el Covid con esos mismo trimestres pero de distintos años.
-
-```{r}
-datosCovid <- datos %>%
-  filter(unit=="THS_T") %>%
-  filter(geo=="EU27_2020") %>%
-  filter(TIME_PERIOD>="2019-4-01")%>%
-  filter(TIME_PERIOD<="2022-4-01")%>%
-  filter(nace_r2=="TOTAL_HH")
-
-View(datosCovid)
-```
-Observamos como el total de toneladas de gases de efecto invernadero expulsados por la unión Europea en el segundo cuatrimestre de 2019 era de 917020.5 toneladas mientras que el mismo cuatrimestre de 2020 caía hasta un nivel de 740517.7 toneladas. Al año siguiente volvío a subir a 853316.9 toneladas en el mismo cuatrimestre. Por tanto apreciamos un descenso de casi dosciantas mil toneladas de gases perjudiciales como consecuancia del parón scocioeconómico causado por el COVID.
-
-
-Ahora pasamos a crear los mapas animados de todo el periodo de nuestro proceso estocastico para las variables THS_T Y T_HAB:
-```{r warnings = FALSE }
-EU_anim = tm_shape(EU_mapa,bbox=tmaptools::bb(matrix(c(1000000,1000000,6000000,6000000),2,2))) +   tm_fill(palette ="Reds",col = "values",style = "jenks",, title = "GASES DE EFECTO INVERNADERO EXPULSADOS POR LA UNION EUROPEA") +
-  tm_facets(along = "TIME_PERIOD", free.coords = FALSE)
-
-
-tmap_animation(EU_anim, filename = "EU_anim.gif", delay=50,message=F)
-```
-Visualizamos como alemania es la mas destacada por su expulsión de gases, seguida de francia, italia y polónia
-
-```{r warnings = FALSE }
-EU_anim_THAB = tm_shape(EU_mapa_THAB,bbox=tmaptools::bb(matrix(c(1000000,1000000,6000000,6000000),2,2))) +   tm_fill(palette ="Oranges",col = "values",style = "jenks",n = 7, title = "GASES EXPULSADOS POR LA UNION EUROPEA PER CÁPITA", legend.is.portrait = TRUE) +
-  tm_facets(along = "TIME_PERIOD", free.coords = FALSE)
-
-
-tmap_animation(EU_anim_THAB, filename = "EU_anim_THAB.gif", delay=50,message=F)
-```
-Mientras que utilizando la variable de toneladas de gases de efecto invernadero expulsados per capita observamos como paises como Irlanda, Estonía, Dinamarca o Luxemburgo son los que mas destacan por su contaminación per capita. Aunque en menos proporcion pero siendo muy constantes Alemanía, Polonía y Finlandía tambien son los mayores contaminadores de la union europea.
-
-
-
-Despues de haber visualizado la serie temporal de una forma mas grafica a traves del mapeo es hora de analizar estas series temporles.
-#############################################################################################################################################################################################################################################################################################
 ## Depuración de los datos y transformación a series temporales.
 
 Para empezar vamos a filtrar nuestra base de datos y crear nuestros objetos en series temporales para su posterior analisis. Lo primero va a ser visualizar las gráficas para obtener información de su comportamiento.
@@ -390,6 +223,7 @@ autoplot(fitTHS)+
        colour = "Gears")+
     theme_bw()
 ```
+
 Se observa una estacionalidad trimestral super clara a parte de una tendencia decreciente a lo largo de toda la serie salvo por el momento del efecto inverso del covid. También observamos una falta de estacionariedad clara y por tanto ni nos fijamos en los coeficientes de autocorrelación.
 
 Creamos otra grafica para visualizar Mejor:
@@ -403,15 +237,18 @@ autoplot(datosEU_THS_T.ts, series="Serie Temporal") +
        ) + 
     theme_bw()
 ```
+
 Una vez visualizado la tendencia de forma mas grafica pasamos a intentar entender mejor la estacionaidad de nuestra serie.
+
 ```{r}
 ggseasonplot(datosEU_THS_T.ts)
 summary(datosEU_THS_T$values)
 ```
+
 Y como podemos observar, hay una clara estacionalidad. En los segundos y terceros trimestres del año los europeos expulsamos menos gases de efecto invernadero que en el primer y cuarto trimestre. Lo más probable debido a las temperaturas bajas de esos momentos(otoño/invierno) y el uso de energías contaminantes para la generación de calor.
 
-
 Pasamos a crear una última grafica interactiva que nos permite saber los valores para cada momento temporal.
+
 ```{r}
 # Convertir a millones de toneladas para visualizar mejor
 datosEU_THS_T_mill <- datosEU_THS_T.ts / 1e6
@@ -435,6 +272,7 @@ Como habiamos dicho anteriormente se ha observado claramente falta de estacionar
 #### Diferenciaciones.
 
 Pasamos a probar cuantas diferenciaciones serán necesarias para estabilizar las series.
+
 ```{r warnings = FALSE }
 ndiffs(datosEU_THS_T.ts)#regulares
 nsdiffs(datosEU_THS_T.ts)#estacionales
@@ -461,8 +299,8 @@ diff.datosEU_THS_T.ts.4<-diff(diff.datosEU_THS_T.ts, lag = 4)
 plot(datosEU_THS_T.ts,main="serie sin diferenciar",col="purple")
 plot(diff.datosEU_THS_T.ts.4,main="serie con una diferencia regular y otra estacional",col="purple")
 ```
-No observamos heterocedasticidad y por tanto no va a ser necesaria hacer ninguna transformación logaritmica o de box-cox. A parte podemos confirmar como se ha eliminado la estacionalidad de la serie y por tanto podemos pasar a intentar visualizar las autocorrelaciones del modelo estacionario para que nos de una idea de que modelo ARIMA nos permitirá modelar dicha serie. 
 
+No observamos heterocedasticidad y por tanto no va a ser necesaria hacer ninguna transformación logaritmica o de box-cox. A parte podemos confirmar como se ha eliminado la estacionalidad de la serie y por tanto podemos pasar a intentar visualizar las autocorrelaciones del modelo estacionario para que nos de una idea de que modelo ARIMA nos permitirá modelar dicha serie.
 
 Una vez supuesta la hipótesis de estacionariedad hay que comprobarla y eso lo relizamos a traves del contraste dickey fuller aumentado.
 
@@ -473,8 +311,8 @@ library(tseries)
 adf<-adf.test(diff.datosEU_THS_T.ts.4)
 adf$p.value
 ```
-Hay evidencias estadísticas suficientes para rechazar la hipótesis nula de raiz unitaria ya que el pvalor obtenido es menor a 0.01, es decir, menor que el nivel de confianza del test. Por tanto la serie se puede considerar estacionaria en media y en varianza.
 
+Hay evidencias estadísticas suficientes para rechazar la hipótesis nula de raiz unitaria ya que el pvalor obtenido es menor a 0.01, es decir, menor que el nivel de confianza del test. Por tanto la serie se puede considerar estacionaria en media y en varianza.
 
 #### Visualización de las Autocorrelaciones.
 
@@ -483,14 +321,14 @@ Acf(diff.datosEU_THS_T.ts.4)
 Pacf(diff.datosEU_THS_T.ts.4)
 ggtsdisplay(diff.datosEU_THS_T.ts.4)
 ```
-Observamos como decrece rapidamente la funcion de autocorrelacion simple y que en la función de autocorelacion parcial sobresale el primer y cuarto autorregresor, por tanto el modelo ARIMA puede que necesite un paremetro p=1 o 4 a parte de alguna diferenciación y por tanto su parametro d puede que tome el valor de la unidad también.
 
+Observamos como decrece rapidamente la funcion de autocorrelacion simple y que en la función de autocorelacion parcial sobresale el primer y cuarto autorregresor, por tanto el modelo ARIMA puede que necesite un paremetro p=1 o 4 a parte de alguna diferenciación y por tanto su parametro d puede que tome el valor de la unidad también.
 
 ### Segunda Etapa:Modelización de las series.
 
 #### Detección de los modelos ARIMA
-Una vez que hayamos conseguido que la serie sea estacionaria para obtener información de sus autocorrelaciones es hora de identificicar los posibles modelos que mejor se ajusten a nuestra serie original. Para ello probamos distintos modelos ARIMA para a posteriori decidir cual nos convence mas a través de los estadísticos Akaike y BIC.
 
+Una vez que hayamos conseguido que la serie sea estacionaria para obtener información de sus autocorrelaciones es hora de identificicar los posibles modelos que mejor se ajusten a nuestra serie original. Para ello probamos distintos modelos ARIMA para a posteriori decidir cual nos convence mas a través de los estadísticos Akaike y BIC.
 
 ```{r warnings = FALSE }
 library(forecast)
@@ -513,6 +351,7 @@ arima9<- Arima(datosEU_THS_T.ts, order=c(0,1,0), seasonal=list(order=c(0,1,1),pe
 AIC(arima1,arima2,arima3,arima4,arima5,arima6,arima7,arima8,arima9)
 BIC(arima1,arima2,arima3,arima4,arima5,arima6,arima7,arima8,arima9)
 ```
+
 Según el estadístico akaike el modelo que minimiza la perdida de informacíon sería el arima6 y luego el arima9;
 
 ARIMA6 (p=0,d=1,q=1)(P=0,D=1,Q=1)4
@@ -522,6 +361,7 @@ ARIMA9 (p=0,d=1,q=0)(P=0,D=1,Q=1)4
 #### Diagnosis del modelo a través de los residuos.
 
 visualizamos los errores de los modelos para luego contrstar la normalidad de estos:
+
 ```{r warnings = FALSE }
 checkresiduals(arima6, test=FALSE)
 ```
@@ -533,35 +373,37 @@ Parecen que se adecuan a una distribución normal, pero para estar seguros vamos
 shapiro.test(arima6$residuals)
 shapiro.test(arima9$residuals)
 ```
+
 En modelos ARIMA para series macroeconómicas o ambientales, la normalidad perfecta de residuos rara vez se cumple.
 
 ```{r}
 checkresiduals(arima6)
 ```
-Tu SARIMA(0,1,1)(0,1,1)[4] es válido estadísticamente.
-Es normal que Shapiro-Wilk dé p < 0.05 aunque Ljung-Box sea correcto. Lo importante aquí es el Ljung-Box, no la normalidad perfecta.
+
+Tu SARIMA(0,1,1)(0,1,1)[4] es válido estadísticamente. Es normal que Shapiro-Wilk dé p \< 0.05 aunque Ljung-Box sea correcto. Lo importante aquí es el Ljung-Box, no la normalidad perfecta.
 
 ```{r}
 checkresiduals(arima9)
 ```
+
 Vamos que el pvalor de este arima9 es bastante peor que el del arima6, y como los estadísticos akaike y BIC también les pasaba levemente eso lo descartamos y nos quedamos definitivamente con el modelo arima6.
 
 Ahora pasamos a ver si los parametros de nuestros modelos son significativos.
+
 ```{r warnings = FALSE }
 library(lmtest)
 #tsoutliers(arima7$residuals)
 coeftest(arima6) #el parámetro de media movil etsacional sale significativo.
 ```
-En el modelo SARIMA(0,1,1)(0,1,1)[4], el coeficiente estacional SMA(1) resulta altamente significativo (p < 0.001), lo que confirma una fuerte dependencia estacional trimestral en las emisiones de gases de efecto invernadero de la UE. El coeficiente MA(1) presenta un valor próximo a la significación estadística (p ≈ 0.08), lo cual, junto con los criterios de información más bajos y la ausencia de autocorrelación en los residuos, justifica su inclusión. Por tanto, el modelo se considera adecuadamente especificado para realizar pronósticos.
 
-
-
+En el modelo SARIMA(0,1,1)(0,1,1)[4], el coeficiente estacional SMA(1) resulta altamente significativo (p \< 0.001), lo que confirma una fuerte dependencia estacional trimestral en las emisiones de gases de efecto invernadero de la UE. El coeficiente MA(1) presenta un valor próximo a la significación estadística (p ≈ 0.08), lo cual, junto con los criterios de información más bajos y la ausencia de autocorrelación en los residuos, justifica su inclusión. Por tanto, el modelo se considera adecuadamente especificado para realizar pronósticos.
 
 ```{r warnings = FALSE }
 Box.test(arima6$residuals, lag = 20, type = "Ljung-Box")
 
 
 ```
+
 Como el p-valore(0.618) supera al nivel de significación 0.05, afirmamos la hipótesis nula y por tanto confirmamos que los residuos estan incorrelados. De tal manera ahora tenemos nuestro modelo comprobado y podemos pasar a predecir con el.
 
 ```{r}
@@ -573,13 +415,13 @@ autoplot(forecast_arima6)
 ### Tercera etapa: Predicción.
 
 Pasamos a visualizar las predicciones para la serie de toneladas de gases de efecto invernadero expulsados per cápita.
+
 ```{r warnings = FALSE }
 library(forecast)
 
 prediccionesTHS<-forecast(arima6, level = c(95), h = 10)
 autoplot(prediccionesTHS, main= "Expulsión de gases de efecto invernadero por trimestre en Europa")
 ```
-
 
 ```{r}
 library(forecast)
@@ -593,8 +435,6 @@ dygraphs::dygraph(
 )
 
 ```
-
-
 
 ```{r}
 library(forecast)
@@ -632,8 +472,6 @@ dygraph(
 
 ```
 
-
-
 ```{r}
 library(dplyr)
 library(ggplot2)
@@ -662,7 +500,6 @@ ggplot(df_q, aes(x = factor(Year), y = Quarter, fill = Value)) +
 
 ```
 
-
 ```{r}
 ggplot(df_q, aes(x = Quarter, y = Value)) +
   geom_boxplot(outlier.alpha = 0.3) +
@@ -672,7 +509,6 @@ ggplot(df_q, aes(x = Quarter, y = Value)) +
        x = "Trimestre", y = "Millones de toneladas") +
   theme_minimal(base_size = 12)
 ```
-
 
 ```{r}
 library(forecast)
@@ -750,7 +586,6 @@ DT::datatable(
 
 ```
 
- 
 ##Conclusiones
 
 ##Bibliografía
