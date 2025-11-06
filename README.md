@@ -74,6 +74,23 @@ library(zoo)
 
 ------------------------------------------------------------------------
 
+## 📊 Visualización del proyecto (versión web)
+
+Para ver el informe completo con gráficos interactivos, visita la versión web del proyecto:
+
+👉 **https://emiliocdep.github.io/GEI_EU/**
+
+Esta visualización incluye:
+- Gráficos interactivos (dygraphs, plotly, leaflet)
+- Tablas dinámicas (DT)
+- Resultados del modelo SARIMA
+- Mapas y análisis geoespacial
+- Previsiones trimestrales de emisiones
+
+> Nota: La vista en GitHub (github.com) muestra solo el código.  
+> Para ver la versión final completa debe abrirse el enlace anterior.
+
+
 ## 🚀 Cómo reproducir el análisis
 
 1.  Clona el repositorio:
