@@ -3,8 +3,11 @@
 [![Ver informe web](https://img.shields.io/badge/📈_Ver_informe_web-Click_aquí-2ea44f?style=for-the-badge)](https://emiliocdep.github.io/GEI_EU/)
 
 
-Este proyecto realiza un análisis exploratorio, espacial y de predicción sobre la expulsión de gases de efecto invernadero (GEI) en Europa a partir de datos trimestrales.\
+Este proyecto realiza un análisis exploratorio, espacial y de predicción sobre la expulsión de gases de efecto invernadero (GEI) en Europa a partir de datos trimestrales.
 Incluye el modelado mediante un modelo **SARIMA** y la representación **geográfica interactiva** de las emisiones por país.
+
+Datos de Eurostat -> **https://ec.europa.eu/eurostat/databrowser/view/env_ac_aigg_q/default/table?lang=e**
+
 
 ------------------------------------------------------------------------
 
