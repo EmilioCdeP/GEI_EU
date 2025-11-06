@@ -24,10 +24,9 @@ El estudio de nuestro caso práctico recopila información de los gases de efect
 
 Los datos utilizados para este estudio los obtenemos via eurostat. Este es el enlace: <https://ec.europa.eu/eurostat/databrowser/view/env_ac_aigg_q/default/table?lang=en>
 
-```{r warnings = FALSE}
+```{r, warnings = FALSE}
 library(eurostat)
 datos = get_eurostat("env_ac_aigg_q")
-View(datos)
 unique(datos$unit)
 ```
 
@@ -37,13 +36,12 @@ Los datos descargados son un un proceso estocastico que transcurre desde el 2010
 
 La principal variable de medición de interés es THS_T (Toneladas de gases de efecto invernadero expulsados).
 
-```{r warnings = FALSE }
+```{r, warnings = FALSE }
 library(dplyr)
 
 datosTT <- datos %>%
   filter(unit=="THS_T") %>%
   filter(geo!="EU27_2020") 
-View(datosTT)
 ```
 
 Este primer filtrado de los datos se realiza para la posterior visualización y mapeo de los paises europeos.
@@ -54,7 +52,7 @@ Este primer filtrado de los datos se realiza para la posterior visualización y 
 
 Para la creación de los mapas es necesario la descarga de una cartografía que contenga los paises de la Unión Europea y esto lo realizamos a través de la página de eurostat. Este es el enlace: <https://ec.europa.eu/eurostat/web/gisco/geodata/reference-data/administrative-units-statistical-units/nuts>
 
-```{r warnings = FALSE }
+```{r, warnings = FALSE }
 library(sf)
 library(tmap)
 
@@ -63,20 +61,20 @@ summary(EU_MAP)
 summary(EU_MAP$LEVL_CODE)
 ```
 
-```{r warnings = FALSE }
+```{r, warnings = FALSE }
 st_crs(EU_MAP)
 ```
 
 Obtenemos el sistema de referencia que se utiliza en esta cartografía, así como los paises y sus repectivas islas ilustradas en el.
 
-```{r warnings = FALSE }
+```{r, warnings = FALSE }
 tm_shape(EU_MAP)+
   tm_borders()
 ```
 
 Las graficamos para visualizar y observamos como la cartografia contiene a parte de los paises todos los respectivos multipoligonos asociados a los pueblos y las comunidades autonomas.Por eso es necesario realizar un filtro en la cartografia y quedarnos solo con los NUTS=0 es decir los paises.
 
-```{r warnings = FALSE }
+```{r, warnings = FALSE }
 EU_MAP <- EU_MAP %>%
     filter(LEVL_CODE==0)
 
@@ -88,7 +86,7 @@ Una vez que nuestra cartografia se coresponde con nuestro objetivo de estudio es
 
 ### Unión con los datos.
 
-```{r warnings = FALSE}
+```{r, warnings = FALSE}
 EU_mapa<-dplyr::left_join(EU_MAP, datosTT, by=c("NUTS_ID"="geo"))
 
 EU_mapa <- EU_mapa %>%
@@ -100,7 +98,7 @@ EU_mapa <- EU_mapa %>%
 
 Filtramos un trimestre aleatorio para visualizar si todo esta en orden.
 
-```{r warnings = FALSE}
+```{r, warnings = FALSE}
 EU_mapa2207 <- EU_mapa %>%
   filter(TIME_PERIOD=="2024-07-01")
 
@@ -112,9 +110,9 @@ La cartografia por culpa de las islas de algunos paises queda muy alejada y la v
 
 Generamos una BBDD con las medias de los valores de cada pais a lo largo del tiempo para poder visualizar bien la importancia de cada país.
 
-```{r}
+```{r, warning=FALSE}
 EU_mapa_media <- EU_mapa %>%
-    group_by(NUTS_NAME) %>%        # agrupa por país (ajusta el nombre si es otro, ej. "name")
+    group_by(NUTS_NAME) %>%        
     summarise(media_value = mean(values, na.rm = TRUE)) %>% 
     ungroup()
 
@@ -142,13 +140,13 @@ tm_shape(EU_mapa_media, bbox = bbox_eu) +
 
 Visualizamos como claramente Alemania es el país que más GEI expulsa, seguido por Francia, Italia y Polonia.
 
-############################################################################################################################################################################################################################################################################################# 
+######################################################################################################################################################################################################################################################
 
 ## Depuración de los datos y transformación a series temporales.
 
 Para empezar vamos a filtrar nuestra base de datos y crear nuestros objetos en series temporales para su posterior analisis. Lo primero va a ser visualizar las gráficas para obtener información de su comportamiento.
 
-```{r warnings = FALSE }
+```{r, warnings = FALSE }
 library(dplyr)
 library(forecast)
 library(ggplot2)
@@ -161,7 +159,7 @@ datosEU_THS_T <- datos %>%
   arrange(TIME_PERIOD)
 
 datosEU_THS_T.ts <- ts(datosEU_THS_T$values,end=c(2025,1),frequency =4)
-View(datosEU_THS_T)
+
 
 ggtsdisplay(datosEU_THS_T.ts,main="Expulsion de gases de efecto invernadero en EUROPA",xlab="AÑO",ylab="MIlies de toneladas")
 
@@ -179,7 +177,7 @@ Se observa una estacionalidad trimestral super clara a parte de una tendencia de
 
 Creamos otra grafica para visualizar Mejor:
 
-```{r warnings = FALSE }
+```{r, warnings = FALSE }
 autoplot(datosEU_THS_T.ts, series="Serie Temporal") + 
     autolayer(trendcycle(fitTHS), series="Tendencia") +
     labs(title = "Expulsión de gases de efecto invernadero en Europa",      
@@ -191,28 +189,12 @@ autoplot(datosEU_THS_T.ts, series="Serie Temporal") +
 
 Una vez visualizado la tendencia de forma mas grafica pasamos a intentar entender mejor la estacionaidad de nuestra serie.
 
-```{r}
+```{r, warning=FALSE}
 ggseasonplot(datosEU_THS_T.ts)
 summary(datosEU_THS_T$values)
 ```
 
 Y como podemos observar, hay una clara estacionalidad. En los segundos y terceros trimestres del año los europeos expulsamos menos gases de efecto invernadero que en el primer y cuarto trimestre. Lo más probable debido a las temperaturas bajas de esos momentos(otoño/invierno) y el uso de energías contaminantes para la generación de calor.
-
-Pasamos a crear una última grafica interactiva que nos permite saber los valores para cada momento temporal.
-
-```{r}
-# Convertir a millones de toneladas para visualizar mejor
-datosEU_THS_T_mill <- datosEU_THS_T.ts / 1e6
-
-library(dygraphs)
-
-dygraph(datosEU_THS_T_mill,
-        main ="Expulsión de gases de efecto invernadero por Europa",
-        xlab = "Años",
-        ylab = "Millones de toneladas") 
-
-
-```
 
 ## Metodologia Box_Jenkins
 
@@ -224,7 +206,7 @@ Como habiamos dicho anteriormente se ha observado claramente falta de estacionar
 
 Pasamos a probar cuantas diferenciaciones serán necesarias para estabilizar las series.
 
-```{r warnings = FALSE }
+```{r, warnings = FALSE }
 ndiffs(datosEU_THS_T.ts)#regulares
 nsdiffs(datosEU_THS_T.ts)#estacionales
 ```
@@ -233,7 +215,7 @@ Por tanto va a ser necesario realizar una diferencia regular y una estacional pa
 
 ##### Diferenciación Regular
 
-```{r warnings = FALSE }
+```{r, warnings = FALSE }
 library(forecast)
 diff.datosEU_THS_T.ts<-diff(datosEU_THS_T.ts)
 plot(datosEU_THS_T.ts,main="serie sin diferenciar",col="purple")
@@ -245,7 +227,7 @@ Ahora observamos como las series se han estabilizado en media, pero siguen conte
 
 ##### Diferenciación estacional
 
-```{r warnings = FALSE }
+```{r, warnings = FALSE }
 diff.datosEU_THS_T.ts.4<-diff(diff.datosEU_THS_T.ts, lag = 4)
 plot(datosEU_THS_T.ts,main="serie sin diferenciar",col="purple")
 plot(diff.datosEU_THS_T.ts.4,main="serie con una diferencia regular y otra estacional",col="purple")
@@ -257,7 +239,7 @@ Una vez supuesta la hipótesis de estacionariedad hay que comprobarla y eso lo r
 
 ##### Contraste de Estacionariedad
 
-```{r warnings = FALSE }
+```{r, warnings = FALSE }
 library(tseries)
 adf<-adf.test(diff.datosEU_THS_T.ts.4)
 adf$p.value
@@ -267,7 +249,7 @@ Hay evidencias estadísticas suficientes para rechazar la hipótesis nula de rai
 
 #### Visualización de las Autocorrelaciones.
 
-```{r warnings = FALSE }
+```{r, warnings = FALSE }
 Acf(diff.datosEU_THS_T.ts.4)
 Pacf(diff.datosEU_THS_T.ts.4)
 ggtsdisplay(diff.datosEU_THS_T.ts.4)
@@ -281,7 +263,7 @@ Observamos como decrece rapidamente la funcion de autocorrelacion simple y que e
 
 Una vez que hayamos conseguido que la serie sea estacionaria para obtener información de sus autocorrelaciones es hora de identificicar los posibles modelos que mejor se ajusten a nuestra serie original. Para ello probamos distintos modelos ARIMA para a posteriori decidir cual nos convence mas a través de los estadísticos Akaike y BIC.
 
-```{r warnings = FALSE }
+```{r, warnings = FALSE }
 library(forecast)
 arima1<- Arima(datosEU_THS_T.ts, order=c(0,1,2), seasonal=list(order=c(0,1,1),period=4))
 arima2<- Arima(datosEU_THS_T.ts, order=c(1,1,0), seasonal=list(order=c(1,1,1),period=4))
@@ -297,7 +279,7 @@ arima9<- Arima(datosEU_THS_T.ts, order=c(0,1,0), seasonal=list(order=c(0,1,1),pe
 
 #### Elección del modelo a través de los estadisticos.
 
-```{r warnings = FALSE }
+```{r, warnings = FALSE }
 #Para la serie de miles de toneladas
 AIC(arima1,arima2,arima3,arima4,arima5,arima6,arima7,arima8,arima9)
 BIC(arima1,arima2,arima3,arima4,arima5,arima6,arima7,arima8,arima9)
@@ -313,27 +295,15 @@ ARIMA9 (p=0,d=1,q=0)(P=0,D=1,Q=1)4
 
 visualizamos los errores de los modelos para luego contrstar la normalidad de estos:
 
-```{r warnings = FALSE }
-checkresiduals(arima6, test=FALSE)
-```
-
-Parecen que se adecuan a una distribución normal, pero para estar seguros vamos a realizar el contraste de shapiro-Wilk de normalidad que compara la hipótesis nula de normalidad con la hipótesis alternativa de no normalidad.
-
-```{r warnings = FALSE }
-#library(printr)
-shapiro.test(arima6$residuals)
-shapiro.test(arima9$residuals)
-```
-
 En modelos ARIMA para series macroeconómicas o ambientales, la normalidad perfecta de residuos rara vez se cumple.
 
-```{r}
+```{r, warning=FALSE}
 checkresiduals(arima6)
 ```
 
 Tu SARIMA(0,1,1)(0,1,1)[4] es válido estadísticamente. Es normal que Shapiro-Wilk dé p \< 0.05 aunque Ljung-Box sea correcto. Lo importante aquí es el Ljung-Box, no la normalidad perfecta.
 
-```{r}
+```{r, warning=FALSE}
 checkresiduals(arima9)
 ```
 
@@ -341,15 +311,15 @@ Vamos que el pvalor de este arima9 es bastante peor que el del arima6, y como lo
 
 Ahora pasamos a ver si los parametros de nuestros modelos son significativos.
 
-```{r warnings = FALSE }
+```{r, warnings = FALSE }
 library(lmtest)
-#tsoutliers(arima7$residuals)
+
 coeftest(arima6) #el parámetro de media movil etsacional sale significativo.
 ```
 
 En el modelo SARIMA(0,1,1)(0,1,1)[4], el coeficiente estacional SMA(1) resulta altamente significativo (p \< 0.001), lo que confirma una fuerte dependencia estacional trimestral en las emisiones de gases de efecto invernadero de la UE. El coeficiente MA(1) presenta un valor próximo a la significación estadística (p ≈ 0.08), lo cual, junto con los criterios de información más bajos y la ausencia de autocorrelación en los residuos, justifica su inclusión. Por tanto, el modelo se considera adecuadamente especificado para realizar pronósticos.
 
-```{r warnings = FALSE }
+```{r, warnings = FALSE }
 Box.test(arima6$residuals, lag = 20, type = "Ljung-Box")
 
 
@@ -357,37 +327,11 @@ Box.test(arima6$residuals, lag = 20, type = "Ljung-Box")
 
 Como el p-valore(0.618) supera al nivel de significación 0.05, afirmamos la hipótesis nula y por tanto confirmamos que los residuos estan incorrelados. De tal manera ahora tenemos nuestro modelo comprobado y podemos pasar a predecir con el.
 
-```{r}
-forecast_arima6 <- forecast(arima6, h = 8)
-autoplot(forecast_arima6)
-
-```
-
 ### Tercera etapa: Predicción.
 
 Pasamos a visualizar las predicciones para la serie de toneladas de gases de efecto invernadero expulsados per cápita.
 
-```{r warnings = FALSE }
-library(forecast)
-
-prediccionesTHS<-forecast(arima6, level = c(95), h = 10)
-autoplot(prediccionesTHS, main= "Expulsión de gases de efecto invernadero por trimestre en Europa")
-```
-
-```{r}
-library(forecast)
-library(dygraphs)
-
-prediccionesTHS <- forecast(arima6, level = 95, h = 10)
-
-dygraphs::dygraph(
-  cbind(Serie = datosEU_THS_T.ts, Prediccion = prediccionesTHS$mean),
-  main = "Expulsión de gases de efecto invernadero por trimestre en Europa"
-)
-
-```
-
-```{r}
+```{r, warning=FALSE}
 library(forecast)
 library(dygraphs)
 
@@ -423,15 +367,17 @@ dygraph(
 
 ```
 
-```{r}
+Ahora voy a graficar los datos de una forma que pueda comparar los trimestres de cada año de una forma clara y visual.
+
+```{r, warning=FALSE}
 library(dplyr)
 library(ggplot2)
 library(zoo)     # para yearqtr
 library(scales)  # para etiquetas bonitas
 
 # Escala a millones
-serie_mill <- as.numeric(datosEU_THS_T.ts) / 1e6
-ti <- as.yearqtr(time(datosEU_THS_T.ts))
+serie_mill <- as.numeric(datosEU_THS_T.ts) / 1e6 #Así las unidades están en millones de toneladas
+ti <- as.yearqtr(time(datosEU_THS_T.ts)) #Formato de cuartos de año para poder visualizar bien
 
 df_q <- tibble::tibble(
   Year    = as.integer(format(ti, "%Y")),
@@ -451,7 +397,7 @@ ggplot(df_q, aes(x = factor(Year), y = Quarter, fill = Value)) +
 
 ```
 
-```{r}
+```{r, warning=FALSE}
 ggplot(df_q, aes(x = Quarter, y = Value)) +
   geom_boxplot(outlier.alpha = 0.3) +
   geom_jitter(width = 0.1, alpha = 0.4) +
@@ -461,7 +407,9 @@ ggplot(df_q, aes(x = Quarter, y = Value)) +
   theme_minimal(base_size = 12)
 ```
 
-```{r}
+En el mapa de calor y en este gráfico boxplot segmentado por trimestres se aprecia muy bien la estacionalidad de los datos.
+
+```{r, warning=FALSE}
 library(forecast)
 library(dplyr)
 library(tidyr)
@@ -539,4 +487,10 @@ DT::datatable(
 
 ##Conclusiones
 
-##Bibliografía
+El análisis realizado permite caracterizar con precisión la evolución reciente de las emisiones de gases de efecto invernadero en Europa y ofrecer una proyección sólida a corto y medio plazo. Tras el ajuste y validación del modelo SARIMA(0,1,1)(0,1,1)[4], los resultados muestran una continuidad en la tendencia descendente observada durante la última década, marcada tanto por mejoras tecnológicas como por políticas climáticas más estrictas.
+
+Las previsiones a partir del segundo trimestre de 2025 indican que las emisiones seguirán reduciéndose de forma moderada y estable. En términos intertrimestrales, se espera que los valores permanezcan dentro de rangos similares a los actuales, mientras que la evolución interanual anticipa disminuciones progresivas y consistentes. Por ejemplo, los niveles estimados para 2026 y 2027 continúan situándose por debajo de los registrados en 2024 y 2025, consolidando una trayectoria de descenso estructural.
+
+El patrón estacional —con mínimos habituales en los trimestres centrales del año y repuntes suaves en invierno— se mantiene, pero en todos los casos con valores más bajos respecto a años anteriores. Esto sugiere que el proceso de descarbonización europeo no solo continúa, sino que se profundiza.
+
+En conjunto, el análisis confirma que Europa avanza hacia una reducción sostenida de sus emisiones, sin indicios de incrementos significativos a corto plazo. Las previsiones reforzan la conclusión de que las medidas implementadas están teniendo un efecto apreciable, y que, salvo perturbaciones externas importantes, la tendencia decreciente se mantendrá más allá de 2027.
