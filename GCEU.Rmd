@@ -12,11 +12,11 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Resumen
+# Resumen
 
 Este proyecto consiste en el estudio de las series temporales sobre un caso práctico. Se implementaran para ello diversos métodos estadísticos con el fin de crear modelos que se ajusten lo mejor posible a nuestro caso practico. Tales métodos como los modelos ARIMA nos permitirán modelar y predecir estos procesos estocásticos. Además de estas técnicas se utilizarán cartografías para la previsualización de estas series temporales.
 
-El estudio de nuestro caso práctico recopila información de los gases de efecto invernadero expulsados por la unión europea desde el año 2008 hasta el primer cuatrimestre de 2025. 
+El estudio de nuestro caso práctico recopila información de los gases de efecto invernadero expulsados por la unión europea desde el año 2008 hasta el primer cuatrimestre de 2025.
 
 ## Obtención y tratamiento de los datos.
 
@@ -109,7 +109,6 @@ tm_shape(EU_mapa2207,)+
 ```
 
 La cartografia por culpa de las islas de algunos paises queda muy alejada y la visualización no es buena, por lo que transformamos la caja para visualizar mejor.
-
 
 Generamos una BBDD con las medias de los valores de cada pais a lo largo del tiempo para poder visualizar bien la importancia de cada país.
 
