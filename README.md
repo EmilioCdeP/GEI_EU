@@ -11,7 +11,7 @@ Incluye el modelado mediante un modelo **SARIMA** y la representación **geográ
 ## 📁 Contenido del repositorio
 
 El repositorio está organizado de la siguiente forma:
-
+```
 GEI_EU/
 │
 ├── GCEU.Rmd               # Informe completo del análisis en R Markdown
@@ -27,7 +27,7 @@ GEI_EU/
 │
 ├── .gitignore             # Exclusiones del repositorio
 └── README.md              # Este archivo
-
+```
 ------------------------------------------------------------------------
 
 ## 🧠 Metodología
