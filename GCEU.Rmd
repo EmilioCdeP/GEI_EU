@@ -140,7 +140,7 @@ tm_shape(EU_mapa_media, bbox = bbox_eu) +
 
 Visualizamos como claramente Alemania es el país que más GEI expulsa, seguido por Francia, Italia y Polonia.
 
-######################################################################################################################################################################################################################################################
+###################################################################################################################################################################################################################################################### 
 
 ## Depuración de los datos y transformación a series temporales.
 
@@ -485,7 +485,7 @@ DT::datatable(
 
 ```
 
-##Conclusiones
+## Conclusiones
 
 El análisis realizado permite caracterizar con precisión la evolución reciente de las emisiones de gases de efecto invernadero en Europa y ofrecer una proyección sólida a corto y medio plazo. Tras el ajuste y validación del modelo SARIMA(0,1,1)(0,1,1)[4], los resultados muestran una continuidad en la tendencia descendente observada durante la última década, marcada tanto por mejoras tecnológicas como por políticas climáticas más estrictas.
 
@@ -494,3 +494,11 @@ Las previsiones a partir del segundo trimestre de 2025 indican que las emisiones
 El patrón estacional —con mínimos habituales en los trimestres centrales del año y repuntes suaves en invierno— se mantiene, pero en todos los casos con valores más bajos respecto a años anteriores. Esto sugiere que el proceso de descarbonización europeo no solo continúa, sino que se profundiza.
 
 En conjunto, el análisis confirma que Europa avanza hacia una reducción sostenida de sus emisiones, sin indicios de incrementos significativos a corto plazo. Las previsiones reforzan la conclusión de que las medidas implementadas están teniendo un efecto apreciable, y que, salvo perturbaciones externas importantes, la tendencia decreciente se mantendrá más allá de 2027.
+
+## Futuras líneas de investigación
+
+Una posible extensión natural de este trabajo consiste en desagregar la serie temporal por sectores económicos, aprovechando la clasificación NACE_R2 incluida en el conjunto de datos. En este proyecto se ha analizado la serie agregada de “actividades totales”, pero los datos disponibles permiten estudiar de manera independiente sectores como la agricultura, la industria manufacturera, la construcción, los servicios, el transporte o el suministro de electricidad y gas, entre otros.
+
+Realizar un análisis temporal por cada categoría permitiría identificar qué sectores contribuyen en mayor medida a la evolución de las emisiones y cómo varía su peso relativo a lo largo del tiempo. Además, se podrían comparar patrones estacionales, evaluar el impacto de políticas sectoriales específicas y modelar predicciones diferenciadas para cada actividad económica.
+
+Este enfoque abriría la puerta a modelos multivariantes o descomposiciones estructurales, así como a la posibilidad de estimar la aportación marginal de cada sector a las variaciones trimestrales de GEI. En conjunto, estas líneas ampliarían la capacidad explicativa del análisis y proporcionarían una visión más detallada del comportamiento de las emisiones en Europa.
