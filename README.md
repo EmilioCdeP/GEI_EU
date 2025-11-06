@@ -36,26 +36,26 @@ GEI_EU/
 ## 🧠 Metodología
 
 1.  **Carga y limpieza de datos**
-    -   Descarga de datos de Eurostat mediante la API oficial (`eurostat`).\
-    -   Conversión de unidades a millones de toneladas.\
-    -   Estandarización de nombres de países y códigos ISO.\
+    -   Descarga de datos de Eurostat mediante la API oficial (`eurostat`).
+    -   Conversión de unidades a millones de toneladas.
+    -   Estandarización de nombres de países y códigos ISO.
     -   Creación de series temporales trimestrales (`ts`).
 2.  **Análisis exploratorio**
-    -   Evolución de las emisiones por año y trimestre.\
-    -   Comparación entre trimestres y análisis estacional.\
+    -   Evolución de las emisiones por año y trimestre.
+    -   Comparación entre trimestres y análisis estacional.
     -   Identificación de tendencias y anomalías.
 3.  **Geocomputación y análisis espacial** 🌍
-    -   Integración de datos de emisiones con geometrías geográficas de Europa (`sf`).\
-    -   Cálculo de medias de emisiones por país.\
-    -   Creación de mapas temáticos interactivos con `tmap` y `ggplot2`.\
+    -   Integración de datos de emisiones con geometrías geográficas de Europa (`sf`).
+    -   Cálculo de medias de emisiones por país.
+    -   Creación de mapas temáticos interactivos con `tmap` y `ggplot2`.
     -   Visualización de patrones espaciales y temporales de las emisiones.
 4.  **Modelado y validación estadística**
-    -   Modelos ARIMA y SARIMA mediante `forecast` y `tseries`.\
-    -   Validación de residuos (Ljung-Box, Shapiro-Wilk, tests de autocorrelación con `lmtest`).\
+    -   Modelos ARIMA y SARIMA mediante `forecast` y `tseries`.
+    -   Validación de residuos (Ljung-Box, Shapiro-Wilk, tests de autocorrelación con `lmtest`).
     -   Selección de modelo óptimo según AIC y BIC.
 5.  **Pronóstico y visualización interactiva**
-    -   Predicción de emisiones hasta 10 trimestres futuros.\
-    -   Gráficos interactivos con `dygraphs`.\
+    -   Predicción de emisiones hasta 10 trimestres futuros.
+    -   Gráficos interactivos con `dygraphs`.
     -   Tablas dinámicas con `DT` y salida formateada con `printr`.
 
 ------------------------------------------------------------------------
@@ -84,9 +84,9 @@ library(zoo)
 
 ## 🧾 Resultados principales
 
--   El modelo **SARIMA(0,1,1)(0,1,1)[4]** fue el más adecuado para la predicción de emisiones.\
--   Los residuos del modelo presentan comportamiento de **ruido blanco**, indicando un buen ajuste.\
--   Se generaron previsiones fiables hasta el año **2027**.\
+-   El modelo **SARIMA(0,1,1)(0,1,1)[4]** fue el más adecuado para la predicción de emisiones.
+-   Los residuos del modelo presentan comportamiento de **ruido blanco**, indicando un buen ajuste.
+-   Se generaron previsiones fiables hasta el año **2027**.
 -   Los mapas evidencian diferencias significativas entre regiones del norte y sur de Europa en la evolución de las emisiones.
 
 ------------------------------------------------------------------------
