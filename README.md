@@ -14,19 +14,22 @@ El repositorio está organizado de la siguiente forma:
 ```
 GEI_EU/
 │
-├── GCEU.Rmd               # Informe completo del análisis en R Markdown
-├── index.qmd              # Página principal del sitio web (Quarto)
-├── _quarto.yml            # Configuración del sitio (Quarto Website)
+├── Datos/                         
+│   ├── NUTS_RG_60M_2021_3035.shp  # Cartografía de Eurostat
 │
-├── docs/                  # ✅ Sitio web generado (GitHub Pages)
-│   ├── index.html         # Página principal renderizada
-│   ├── GCEU.html          # Informe completo interactivo
-│   ├── search.json        # Configuración de búsqueda
-│   ├── site_libs/         # Librerías JS/CSS para interactividad
-│   └── ...                # Otros archivos generados automáticamente
+├── docs/                          # ✅ Sitio web generado (GitHub Pages)
+│   ├── index.html                 # Página principal renderizada
+│   ├── GCEU.html                  # Informe completo interactivo
+│   ├── search.json                # Configuración de búsqueda
+│   ├── site_libs/                 # Librerías JS/CSS para interactividad
+│   └── ...                        # Otros archivos generados automáticamente
 │
-├── .gitignore             # Exclusiones del repositorio
-└── README.md              # Este archivo
+├── .gitignore                     # Exclusiones del repositorio
+├── GCEU.Rmd                       # Informe completo del análisis en R Markdown
+└── README.md                      # Este archivo
+├── _quarto.yml                    # Configuración del sitio (Quarto Website)
+├── index.qmd                      # Página principal del sitio web (Quarto)
+
 ```
 ------------------------------------------------------------------------
 
