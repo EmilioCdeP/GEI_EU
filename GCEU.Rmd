@@ -12,54 +12,6 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r messages = FALSE}
-```
-
-```{r warnings = FALSE}
-```
-
-# INDICE
-
-1-Obtención y tratamiento de los datos.
-
--Obtención a través de Eurostat.
-
--Depuración con la libreria dplyr.
-
-2-Mapeo y visualización de los datos.
-
--Obtención de las cartografias.
-
--Unión con los datos.
-
--Transformación del mapa para la visualización.
-
--Mapas animados ;)
-
-3-Depuración de los datos y transformación a series temporales.
-
-4-Metodología Box-Jenkins
-
--Primera Etapa:Estacionarización de las series.
-
--Diferenciaciones.
-
--Visualización de las Autocorrelaciones.
-
--Segunda Etapa:Modelización de las series.
-
--Detección de los modelos ARIMA
-
--Elección del modelo a través de los estadisticos.
-
--Diagnosis del modelo a través de los residuos.
-
--Tercera Etapa:Predicción.
-
-5-Conclusiones.
-
-6-Bibliografía.
-
 ## Resumen
 
 Este proyecto consiste en el estudio de las series temporales sobre un caso práctico. Se implementaran para ello diversos métodos estadísticos con el fin de crear modelos que se ajusten lo mejor posible a nuestro caso practico. Tales métodos como los modelos ARIMA nos permitirán modelar y predecir estos procesos estocásticos. Además de estas técnicas se utilizarán cartografías para la previsualización de estas series temporales.

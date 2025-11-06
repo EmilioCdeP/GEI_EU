@@ -1,0 +1,105 @@
+# 📊 Análisis y Predicción de Gases de Efecto Invernadero en Europa
+
+Este proyecto realiza un análisis exploratorio, espacial y de predicción sobre la expulsión de gases de efecto invernadero (GEI) en Europa a partir de datos trimestrales.\
+Incluye el modelado mediante un modelo **SARIMA** y la representación **geográfica interactiva** de las emisiones por país.
+
+------------------------------------------------------------------------
+
+## 📁 Contenido del repositorio
+
+-   **GCEU.Rmd** → Documento principal en R Markdown con todo el flujo de análisis.\
+-   **/data/** → Archivos de datos fuente.\
+-   **README.md** → Este archivo.
+
+------------------------------------------------------------------------
+
+## 🧠 Metodología
+
+1.  **Carga y limpieza de datos**
+    -   Descarga de datos de Eurostat mediante la API oficial (`eurostat`).\
+    -   Conversión de unidades a millones de toneladas.\
+    -   Estandarización de nombres de países y códigos ISO.\
+    -   Creación de series temporales trimestrales (`ts`).
+2.  **Análisis exploratorio**
+    -   Evolución de las emisiones por año y trimestre.\
+    -   Comparación entre trimestres y análisis estacional.\
+    -   Identificación de tendencias y anomalías.
+3.  **Geocomputación y análisis espacial** 🌍
+    -   Integración de datos de emisiones con geometrías geográficas de Europa (`sf`).\
+    -   Cálculo de medias de emisiones por país.\
+    -   Creación de mapas temáticos interactivos con `tmap` y `ggplot2`.\
+    -   Visualización de patrones espaciales y temporales de las emisiones.
+4.  **Modelado y validación estadística**
+    -   Modelos ARIMA y SARIMA mediante `forecast` y `tseries`.\
+    -   Validación de residuos (Ljung-Box, Shapiro-Wilk, tests de autocorrelación con `lmtest`).\
+    -   Selección de modelo óptimo según AIC y BIC.
+5.  **Pronóstico y visualización interactiva**
+    -   Predicción de emisiones hasta 10 trimestres futuros.\
+    -   Gráficos interactivos con `dygraphs`.\
+    -   Tablas dinámicas con `DT` y salida formateada con `printr`.
+
+------------------------------------------------------------------------
+
+## 📦 Librerías utilizadas
+
+``` r
+library(DT)
+library(dplyr)
+library(dygraphs)
+library(eurostat)
+library(forecast)
+library(ggplot2)
+library(lmtest)
+library(printr)
+library(scales)
+library(sf)
+library(stats)
+library(tidyr)
+library(tmap)
+library(tseries)
+library(zoo)
+```
+
+------------------------------------------------------------------------
+
+## 🧾 Resultados principales
+
+-   El modelo **SARIMA(0,1,1)(0,1,1)[4]** fue el más adecuado para la predicción de emisiones.\
+-   Los residuos del modelo presentan comportamiento de **ruido blanco**, indicando un buen ajuste.\
+-   Se generaron previsiones fiables hasta el año **2027**.\
+-   Los mapas evidencian diferencias significativas entre regiones del norte y sur de Europa en la evolución de las emisiones.
+
+------------------------------------------------------------------------
+
+## 🚀 Cómo reproducir el análisis
+
+1.  Clona el repositorio:
+
+    ``` bash
+    git clone https://github.com/EmilioCdeP/GEI_EU.git
+    ```
+
+2.  Abre el archivo `GCEU.Rmd` en **RStudio**.
+
+3.  Instala las librerías necesarias (si no las tienes):
+
+    ``` r
+    install.packages(c("DT", "dplyr", "dygraphs", "eurostat", "forecast", "ggplot2",
+                       "lmtest", "printr", "scales", "sf", "stats", "tidyr", "tmap",
+                       "tseries", "zoo"))
+    ```
+
+4.  Ejecuta las celdas o **Knit** el documento para generar el informe.
+
+------------------------------------------------------------------------
+
+## 🧑‍💻 Autor
+
+-   **Nombre:** Emilio Coronado\
+-   **Fecha:** 2025
+
+------------------------------------------------------------------------
+
+## 📄 Licencia
+
+Este proyecto se distribuye bajo la licencia **MIT**, lo que permite su libre uso, modificación y distribución, siempre citando la fuente original.
