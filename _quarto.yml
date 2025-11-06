@@ -1,0 +1,17 @@
+project:
+  type: website
+  output-dir: docs
+
+website:
+  title: "Gases de Efecto Invernadero en Europa"
+  navbar:
+    left:
+      - text: "Informe"
+        href: GCEU.html
+
+format:
+  html:
+    theme: flatly
+    toc: true
+    toc-location: left
+    code-fold: true

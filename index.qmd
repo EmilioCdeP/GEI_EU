@@ -1,0 +1,12 @@
+---
+title: "GEI Europa — Resumen"
+---
+
+# Bienvenido/a
+
+Este sitio publica el análisis y el pronóstico de emisiones de gases de efecto invernadero en Europa.
+
+- 📄 **Informe completo:** [GCEU](GCEU.html)
+- 📦 **Repositorio:** (este mismo proyecto en GitHub)
+
+> Nota: Los gráficos interactivos (dygraphs, DT, etc.) se renderizan al compilar el sitio.
