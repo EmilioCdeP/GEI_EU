@@ -10,21 +10,23 @@ Incluye el modelado mediante un modelo **SARIMA** y la representación **geográ
 
 ## 📁 Contenido del repositorio
 
+El repositorio está organizado de la siguiente forma:
+
 GEI_EU/
 │
-├── GCEU.Rmd # Informe completo del análisis en R Markdown
-├── index.qmd # Página principal del sitio web (Quarto)
-├── _quarto.yml # Configuración del sitio (Quarto Website)
+├── GCEU.Rmd               # Informe completo del análisis en R Markdown
+├── index.qmd              # Página principal del sitio web (Quarto)
+├── _quarto.yml            # Configuración del sitio (Quarto Website)
 │
-├── docs/ # ✅ Sitio web generado (GitHub Pages)
-│ ├── index.html # Página principal renderizada
-│ ├── GCEU.html # Informe completo renderizado con interactivos
-│ ├── search.json # Datos de búsqueda interna del sitio
-│ ├── site_libs/ # Librerías JS/CSS necesarias para gráficos interactivos
-│ └── (otros archivos) # Archivos auxiliares generados automáticamente
+├── docs/                  # ✅ Sitio web generado (GitHub Pages)
+│   ├── index.html         # Página principal renderizada
+│   ├── GCEU.html          # Informe completo interactivo
+│   ├── search.json        # Configuración de búsqueda
+│   ├── site_libs/         # Librerías JS/CSS para interactividad
+│   └── ...                # Otros archivos generados automáticamente
 │
-├── .gitignore # Exclusiones del repositorio
-└── README.md # Descripción general del proyecto
+├── .gitignore             # Exclusiones del repositorio
+└── README.md              # Este archivo
 
 ------------------------------------------------------------------------
 
