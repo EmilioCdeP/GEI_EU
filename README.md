@@ -130,9 +130,26 @@ Esta visualización incluye:
 
 ------------------------------------------------------------------------
 
+## 🔮 Futuras líneas de investigación
+
+Aunque este proyecto analiza las emisiones de gases de efecto invernadero agregadas para el conjunto de actividades económicas, los datos disponibles permiten avanzar hacia un estudio más detallado mediante la desagregación por sectores NACE_R2.
+
+Entre las posibles extensiones destacan:
+
+- **Análisis temporal por sector económico**, estudiando individualmente actividades como agricultura, manufactura, electricidad y gas, construcción, transporte, servicios, etc.
+- **Comparación de patrones estacionales** entre sectores para identificar cuáles presentan mayor variabilidad trimestral o tendencias más pronunciadas.
+- **Estimación de la contribución relativa de cada sector** a los cambios totales observados en las emisiones europeas.
+- **Modelos SARIMA sectoriales** o **modelos multivariantes** que incorporen simultáneamente varias series económicas.
+- **Evaluación del impacto de políticas específicas** sobre determinados sectores, analizando si se observan rupturas estructurales en las series.
+- **Integración con análisis espacial** para comparar sectores entre países o regiones.
+
+Estas líneas permitirían obtener una visión más completa de la dinámica de emisiones en Europa y aportar información útil para la toma de decisiones y el diseño de políticas medioambientales.
+
+------------------------------------------------------------------------
+
 ## 🧑‍💻 Autor
 
--   **Nombre:** Emilio Coronado\
+-   **Nombre:** Emilio Coronado de Palma
 -   **Fecha:** 2025
 
 ------------------------------------------------------------------------
